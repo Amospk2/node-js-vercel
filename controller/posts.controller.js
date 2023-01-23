@@ -35,7 +35,7 @@ module.exports = {
                 return res.status(400).json({ msg: 'Preencha os campos corretamente antes de enviar.' });
             }
         } catch (error) {
-            return res.status(500).json({ msg: 'Falha ao atualizar publicação.' }, error);
+            return res.status(500).json({ msg: 'Falha ao atualizar publicação!!' }, error);
         }
     },
     async show(req, res) {
