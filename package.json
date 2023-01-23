@@ -12,7 +12,6 @@
   "dependencies": {
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "sequelize": "^6.28.0",
     "mysql2": "^3.0.1"
   }
 }

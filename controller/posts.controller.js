@@ -1,81 +1,78 @@
-const Post = require('../models/Post');
-
-module.exports = {
-    async create(req, res) {
+const pool = require("../database/index")
+const postsController = {
+    getAll: async (req, res) => {
         try {
-            const { title, content } = req.body;
-            if (title, content) {
-                const post = await Post.create({
-                    title, content
-                });
-                res.status(201).json(post);
-            } else {
-                return res.status(400).json({ msg: 'Preencha os campos corretamente antes de enviar.' });
-            }
+            const [rows, fields] = await pool.query("select * from posts")
+            res.json({
+                data: rows
+            })
         } catch (error) {
-            res.send(500).json({ msg: 'Falha ao criar publicação' }, error);
+            console.log(error)
+            res.json({
+                status: "error"
+            })
         }
     },
-    async update(req, res) {
+    getById: async (req, res) => {
         try {
-            const { title, content } = req.body;
-
-            if (title, content) {
-                const post = await Post.findOne({ where: { id: req.params.id } });
-
-                if (post) {
-                    post.title = title;
-                    post.content = content;
-                    await post.save();
-                    res.status(200).json(post);
-                } else {
-                    return res.status(404).json({ msg: 'Publicação não encontrada.' });
-                }
-            } else {
-                return res.status(400).json({ msg: 'Preencha os campos corretamente antes de enviar.' });
-            }
+            const { id } = req.params
+            const [rows, fields] = await pool.query("select * from posts where id = ?", [id])
+            res.json({
+                data: rows
+            })
         } catch (error) {
-            return res.status(500).json({ msg: 'Falha ao atualizar publicação!!' }, error);
+            console.log(error)
+            res.json({
+                status: "error"
+            })
         }
     },
-    async show(req, res) {
+    create: async (req, res) => {
         try {
-            const post = await Post.findOne({ where: { id: req.params.id } });
-
-            if (post)
-                return res.status(200).json(post);
-            else
-                return res.status(404).json({ msg: 'Publicação não encontrado.' });
-
+            const { title, content } = req.body
+            const sql = "insert into posts (title, content) values (?, ?)"
+            const [rows, fields] = await pool.query(sql, [title, content])
+            res.json({
+                data: rows
+            })
         } catch (error) {
-            return res.status(500).json({ msg: 'Falha ao buscar publicação.' }, error);
+            console.log(error)
+            res.json({
+                status: "error"
+            })
         }
     },
-    async list(req, res) {
+    update: async (req, res) => {
         try {
-            const post = await Post.findAll();
-            return res.status(200).json(post);
+            const { title, content } = req.body
+            const { id } = req.params
+            const sql = "update posts set title = ?, content = ? where id = ?"
+            const [rows, fields] = await pool.query(sql, [title, content, id])
+            res.json({
+                data: rows
+            })
         } catch (error) {
-            return res.status(500).json({ msg: 'Falha ao buscar publicações.' }, error);
+            console.log(error)
+            res.json({
+                status: "error"
+            })
         }
-    },
-    async delete(req, res) {
+    }, 
+    delete: async (req, res) => {
         try {
-            const post = await Post.findOne({ where: { id: req.params.id } });
-
-            if (post) {
-                await post.destroy();
-                return res.json({ msg: 'Exclusão feita com sucesso!' });
-            } else {
-                return res.status(404).json({ msg: 'Publicação não encontrado.' });
-            }
-
+            const { id } = req.params
+            const [rows, fields] = await pool.query("delete from posts where id = ?", [id])
+            res.json({
+                data: rows
+            })
         } catch (error) {
-            console.log(error);
-            return res.status(500).json({ msg: 'Falha ao excluir publicação.' }, error);
+            console.log(error)
+            res.json({
+                status: "error"
+            })
         }
-    },
-
+    }
 
 }
 
+module.exports = postsController
